@@ -25,8 +25,14 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
 
-      - name: Build and run tests
+      - name: Build and run tests with coverage
         run: mvn clean verify
+
+      - name: Upload JaCoCo coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: back/target/site/jacoco/index.html
 
   frontend-tests:
     name: Test Frontend
@@ -48,5 +54,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run Angular tests
-        run: npm run test -- --watch=false --browsers=ChromeHeadless
+      - name: Run tests with coverage
+        run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+
+      - name: Upload Angular coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: angular-coverage
+          path: front/coverage
