@@ -33,7 +33,7 @@ jobs:
         with:
           name: jacoco-report
           path: back/target/site/jacoco/index.html
-          
+
   backend-analysis:
     name: SonarCloud Backend Analysis
     runs-on: ubuntu-latest
@@ -46,11 +46,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Java 11
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '17'
 
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
