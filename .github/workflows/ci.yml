@@ -1,6 +1,6 @@
-name: WORKFLOW - CI - Frontend & Backend
+name: WORKFLOW - CI/CD - Frontend & Backend
 
-on:
+//on:
   push:
     branches: [ main ]
   pull_request:
@@ -63,11 +63,13 @@ jobs:
 
       - name: Run SonarCloud analysis
         run: mvn sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+
   docker-deploy-back:
-    name: Build & Push Docker Images
+    name: Build & Push Docker Images (Backend)
     runs-on: ubuntu-latest
     needs: 
       - backend-analysis
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -79,10 +81,16 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build backend image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/bobapp-back ./back
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/bobapp-back:$SHORT_SHA ./back
+          docker tag ${{ secrets.DOCKER_USERNAME }}/bobapp-back:$SHORT_SHA ${{ secrets.DOCKER_USERNAME }}/bobapp-back:latest
 
       - name: Push backend image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/bobapp-back
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          docker push ${{ secrets.DOCKER_USERNAME }}/bobapp-back:$SHORT_SHA
+          docker push ${{ secrets.DOCKER_USERNAME }}/bobapp-back:latest
 
   frontend-tests:
     name: Test Frontend
@@ -112,7 +120,7 @@ jobs:
         with:
           name: angular-coverage
           path: front/coverage
-          
+
   frontend-analysis:
     name: SonarCloud Frontend Analysis
     runs-on: ubuntu-latest
@@ -145,10 +153,11 @@ jobs:
             -Dsonar.token=${{ secrets.SONAR_TOKEN }}
 
   docker-deploy-front:
-    name: Build & Push Docker Images
+    name: Build & Push Docker Images (Frontend)
     runs-on: ubuntu-latest
     needs: 
       - frontend-analysis
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -160,8 +169,13 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build frontend image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/bobapp-front ./front
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/bobapp-front:$SHORT_SHA ./front
+          docker tag ${{ secrets.DOCKER_USERNAME }}/bobapp-front:$SHORT_SHA ${{ secrets.DOCKER_USERNAME }}/bobapp-front:latest
 
       - name: Push frontend image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/bobapp-front
-        
+        run: |
+          SHORT_SHA=$(echo "${{ github.sha }}" | cut -c1-7)
+          docker push ${{ secrets.DOCKER_USERNAME }}/bobapp-front:$SHORT_SHA
+          docker push ${{ secrets.DOCKER_USERNAME }}/bobapp-front:latest
