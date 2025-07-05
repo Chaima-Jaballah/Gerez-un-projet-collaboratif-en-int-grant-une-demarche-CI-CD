@@ -1,4 +1,4 @@
-name: WORKFLOW - CI CD - Frontend & Backend
+name: WORKFLOW - CI/CD - Frontend & Backend
 
 on:
   push:
