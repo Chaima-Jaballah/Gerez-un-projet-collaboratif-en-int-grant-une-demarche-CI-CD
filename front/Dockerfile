@@ -1,16 +1,14 @@
-FROM node:18.19.0-alpine3.18 AS build
+FROM node:latest as build
 
 WORKDIR /usr/local/app
 COPY ./ /usr/local/app/
-RUN yarn && yarn cache clean
+
+RUN yarn
 RUN npm run build
+ 
+FROM nginx:latest as production
 
-FROM nginx:1.25.3-alpine AS production
-
-RUN adduser -D user
-COPY --from=build /usr/local/app/dist/bobapp /usr/share/nginx/html
-RUN chown -R user:user /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-#USER user
+COPY --from=build /usr/local/app/dist/bobapp /usr/share/nginx/html
 
-EXPOSE 8080
+EXPOSE 80
