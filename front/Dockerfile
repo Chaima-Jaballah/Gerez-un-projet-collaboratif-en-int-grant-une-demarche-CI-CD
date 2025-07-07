@@ -11,6 +11,6 @@ RUN adduser -D user
 COPY --from=build /usr/local/app/dist/bobapp /usr/share/nginx/html
 RUN chown -R user:user /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-USER user
+#USER user
 
 EXPOSE 8080
