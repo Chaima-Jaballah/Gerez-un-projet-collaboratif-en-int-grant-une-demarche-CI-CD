@@ -51,7 +51,7 @@ jobs:
       - name: Compile the project
         run: mvn clean verify
       - name: Run SonarCloud analysis
-        run: mvn sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+        run: mvn sonar:sonar -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
 
   docker-deploy-back:
     name: Build & Push Docker Images (Backend)
@@ -124,7 +124,10 @@ jobs:
         run: npm install -g sonarqube-scanner
       - name: Run SonarCloud analysis
         run: |
-          npx sonar-scanner -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+          npx sonar-scanner \
+          -Dsonar.token=${{ secrets.SONAR_TOKEN }} \
+          -Dsonar.javascript.lcov.reportPaths=coverage/bobapp/lcov.info
+
 
   docker-deploy-front:
     name: Build & Push Docker Images (Frontend)
